@@ -1,3 +1,8 @@
+import { useState, useEffect } from "react"
+import { uploadFile, saveFilesToDB } from "@/services/fileService"
+import { supabase } from "@/lib/supabase"
+import { getFilesByProject } from "@/services/fileService"
+
 export default function DashboardCard({ projects, onNewProject }) {
   const active = projects.filter(p => p.status !== "paid").length
 
@@ -59,6 +64,56 @@ function StatBox({ label, value, green, yellow }) {
 }
 
 function ProjectRow({ project }) {
+  const [uploading, setUploading] = useState(false)
+  const [files, setFiles] = useState([])
+
+  useEffect(() => {
+    async function fetchFiles() {
+      const { data } = await getFilesByProject(project.id)
+      setFiles(data || [])
+    }
+
+    fetchFiles()
+  }, [project.id])
+
+  const handleFileUpload = async (e) => {
+    const files = e.target.files
+    if (!files.length) return
+
+    setUploading(true)
+
+    const { data: userData } = await supabase.auth.getUser()
+    const user = userData.user
+
+    console.log("USER:", user)
+
+    let uploadedFiles = []
+
+    for (let file of files) {
+      const result = await uploadFile({
+        file,
+        userId: user.id,
+        projectId: project.id,
+      })
+
+      if (!result.error) {
+        uploadedFiles.push({
+          ...result,
+          project_id: project.id,
+          user_id: user.id,
+        })
+      }
+    }
+
+    console.log("UPLOADED FILES:", uploadedFiles)
+
+    if (uploadedFiles.length > 0) {
+      await saveFilesToDB(uploadedFiles)
+    }
+
+    setUploading(false)
+  }
+
   const getStatus = () => {
     if (project.status === "paid") {
       return (
@@ -84,19 +139,98 @@ function ProjectRow({ project }) {
   }
 
   return (
-    <div className="flex items-center justify-between border-t pt-3">
-      <div className="flex items-center gap-3">
-        <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+    <div className="flex flex-col border-t pt-3 gap-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+          <p className="text-sm font-medium">{project.project_name}</p>
+        </div>
 
-        <p className="text-sm font-medium">{project.project_name}</p>
+        <div className="flex items-center gap-6">
+          <p className="text-sm text-gray-600">
+            ₹{Number(project.invoice_amount).toLocaleString()}
+          </p>
+          {getStatus()}
+        </div>
       </div>
 
-      <div className="flex items-center gap-6">
-        <p className="text-sm text-gray-600">
-          ₹{Number(project.invoice_amount).toLocaleString()}
-        </p>
+      <div className="mt-2 space-y-1">
+        {files.length === 0 ? (
+          <p className="text-xs text-gray-400">No files uploaded</p>
+        ) : (
+          files.map((file) => (
+            <div
+              key={file.id}
+              className="relative text-xs bg-gray-50 px-2 py-2 rounded overflow-hidden"
+            >
+              {/* Blurred content */}
+              <div className="blur-sm select-none pointer-events-none">
+                {file.file_name} ({(file.file_size / 1024).toFixed(1)} KB)
+              </div>
 
-        {getStatus()}
+              {/* Lock overlay */}
+              <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+                <span className="text-[10px] font-medium text-gray-700">
+                  🔒 Locked until payment
+                </span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {project.status !== "paid" ? (
+        <p className="text-xs text-gray-500 mt-2">
+          Files are locked. Client must pay to unlock.
+        </p>
+      ) : (
+        <p className="text-xs text-green-600 mt-2">
+          Payment received. Files unlocked.
+        </p>
+      )}
+
+      <div className="flex items-center gap-2 mt-2">
+        <input
+          value={`${location.origin}/p/${project.portal_slug}`}
+          readOnly
+          className="text-xs border px-2 py-1 rounded w-full"
+        />
+
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(
+              `${location.origin}/p/${project.portal_slug}`
+            )
+          }}
+          className="text-xs px-2 py-1 border rounded hover:bg-gray-100"
+        >
+          Copy
+        </button>
+      </div>
+
+      {/* Upload */}
+      <div>
+        <div className="border-2 border-dashed rounded-lg p-4 text-center text-xs text-gray-500">
+          <input
+            type="file"
+            multiple
+            onChange={handleFileUpload}
+            className="hidden"
+            id={`upload-${project.id}`}
+          />
+
+          <label
+            htmlFor={`upload-${project.id}`}
+            className="cursor-pointer"
+          >
+            Click to upload or drag files here
+          </label>
+        </div>
+                {uploading && (
+          <p className="text-xs text-blue-600 mt-1">
+            Uploading files...
+          </p>
+        )}
       </div>
     </div>
   )
