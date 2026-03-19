@@ -3,25 +3,29 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
+import DashboardCard from "@/components/dashboard/DashboardCard"
+import CreateProjectModal from "@/components/dashboard/CreateProjectModal"
+import { getProjects, createProject } from "@/services/projectService"
 
 export default function Dashboard() {
     const router = useRouter()
     const [user, setUser] = useState(null)
-
-    const [projectName, setProjectName] = useState("")
-    const [clientEmail, setClientEmail] = useState("")
-    const [amount, setAmount] = useState("")
+    const [projects, setProjects] = useState([])
+    const [showModal, setShowModal] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        async function getUser() {
-            const { data, error } = await supabase.auth.getUser()
+        async function init() {
+            const { data } = await supabase.auth.getUser()
             if (!data.user) {
                 router.push("/login")
-            } else {
-                setUser(data.user)
+                return
             }
+            setUser(data.user)
+            const { data: projectsData } = await getProjects()
+            setProjects(projectsData || [])
         }
-        getUser()
+        init()
     }, [])
 
     const handleLogout = async () => {
@@ -29,99 +33,39 @@ export default function Dashboard() {
         router.push("/login")
     }
 
-    const createProject = async () => {
-        if (!projectName || !clientEmail || !amount) return
-
-        const slug = Math.random().toString(36).substring(2, 10)
-
-        const { data, error } = await supabase
-            .from("projects")
-            .insert([
-            {
-                user_id: user.id,
-                project_name: projectName,
-                client_email: clientEmail,
-                invoice_amount: amount,
-                portal_slug: slug,
-            },
-            ])
-            .select()
-
-        if (error) {
-            console.error(error)
-            return
+    const handleCreateProject = async (projectData) => {
+        const { data, error } = await createProject(user.id, projectData)
+        if (!error && data) {
+            setProjects((prev) => [data[0], ...prev])
         }
-
-        setProjects((prev) => [data[0], ...prev])
-
-        setProjectName("")
-        setClientEmail("")
-        setAmount("")
+        return { data, error }
     }
 
-    const [projects, setProjects] = useState([])
-
-    const fetchProjects = async () => {
-        const { data } = await supabase
-            .from("projects")
-            .select("*")
-            .order("created_at", { ascending: false })
-
-        setProjects(data || [])
+    if (loading) {
+        return <p className="p-6 text-gray-500">Loading...</p>
     }
-
-    useEffect(() => {
-        fetchProjects()
-    }, [])
 
     return (
-        <>
-            <div className="p-10 space-y-4">
-                <h1 className="text-xl font-bold">Create Project</h1>
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-4xl mx-auto p-6">
+                {/* Basic Header */}
+                <div className="flex justify-between items-center">
+                    <h1 className="text-xl font-semibold">Solva</h1>
+                    <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-black">
+                        Logout
+                    </button>
+                </div>
 
-                <input
-                    placeholder="Project Name"
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                    className="border p-2 w-full"
-                />
+                <DashboardCard projects={projects} onNewProject={() => setShowModal(true)} />
 
-                <input
-                    placeholder="Client Email"
-                    value={clientEmail}
-                    onChange={(e) => setClientEmail(e.target.value)}
-                    className="border p-2 w-full"
-                />
-
-                <input
-                    placeholder="Amount"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="border p-2 w-full"
-                />
-
-                <button
-                    onClick={createProject}
-                    className="bg-black text-white px-4 py-2"
-                >
-                    Create Project
-                </button>
+                {/* Create Project Modal */}
+                {showModal && (
+                    <CreateProjectModal
+                        onClose={() => setShowModal(false)}
+                        onCreate={handleCreateProject}
+                    />
+                )}
             </div>
-
-            <div className="mt-10">
-                <h2 className="font-bold">Your Projects</h2>
-
-                {projects.map((p) => (
-                    <div key={p.id} className="border p-3 mt-2">
-                    <p>{p.project_name}</p>
-                    <p>{p.client_email}</p>
-                    <p>₹{p.invoice_amount}</p>
-                    <p>{p.status}</p>
-                    </div>
-                ))}
-            </div>
-
-            <button onClick={handleLogout}>Logout</button>
-        </>
+        </div>
     )
 }

@@ -9,8 +9,12 @@ export default function Callback() {
 
   useEffect(() => {
     async function handleAuth() {
-      await supabase.auth.getSession()
-      router.push("/dashboard")
+      const { data } = await supabase.auth.getSession()
+      if (data.session) {
+        router.push("/dashboard")
+      } else {
+        router.push("/login")
+      }
     }
 
     handleAuth()
