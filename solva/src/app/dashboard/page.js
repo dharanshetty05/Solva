@@ -42,19 +42,34 @@ export default function Dashboard() {
     }
 
     if (loading) {
-        return <p className="p-6 text-gray-500">Loading...</p>
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#F1EFE8]">
+                <p className="text-sm text-[#888780]">Loading dashboard…</p>
+            </div>
+        )
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-4xl mx-auto p-6">
-                {/* Basic Header */}
-                <div className="flex justify-between items-center">
-                    <h1 className="text-xl font-semibold">Solva</h1>
-                    <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-black">
+        <div className="min-h-screen bg-[#F1EFE8]">
+            <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+                {/* Header */}
+                <header className="flex items-center justify-between">
+                    <div className="space-y-1">
+                        <p className="text-[11px] font-medium tracking-[0.14em] text-[#888780] uppercase">
+                            Solva
+                        </p>
+                        <h1 className="text-xl font-semibold text-[#26215C]">
+                            Your projects, under control.
+                        </h1>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="text-xs font-medium text-[#888780] hover:text-[#2C2C2A] transition-colors"
+                    >
                         Logout
                     </button>
-                </div>
+                </header>
 
                 <DashboardCard projects={projects} onNewProject={() => setShowModal(true)} />
 

@@ -41,114 +41,132 @@ export default function PortalPage() {
         if (slug) fetchData()
     }, [slug])
 
-    if (loading) {
-        return <p className="p-6 text-gray-500">Loading...</p>
-    }
-
-    if (!project) {
-        return <p className="p-6 text-red-500">Project not found</p>
-    }
-
+  if (loading) {
     return (
-        <div className="min-h-screen bg-gray-50 flex justify-center">
-        <div className="w-full max-w-xl p-6 space-y-6">
-
-            {/* Header */}
-            <div className="bg-white p-6 rounded-xl border space-y-2">
-
-            <h1 className="text-lg font-semibold">
-  Your files are ready
-</h1>
-
-<p className="text-sm text-gray-500">
-  Complete payment to unlock and download
-</p>
-
-            <p className="text-sm text-gray-500">
-                Invoice: ₹{Number(project.invoice_amount).toLocaleString()}
-            </p>
-
-            <div>
-                {project.status === "paid" ? (
-                <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700">
-                    Paid
-                </span>
-                ) : (
-                <span className="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
-                    Awaiting payment
-                </span>
-                )}
-            </div>
-            </div>
-
-            {/* Files */}
-            <div className="bg-white p-6 rounded-xl border space-y-3">
-            <h2 className="text-sm font-medium">Files</h2>
-
-            {files.length === 0 ? (
-                <p className="text-xs text-gray-400">
-                    No files uploaded yet. Upload files to lock them.
-                </p>
-            ) : (
-                files.map((file) => (
-                <div
-                    key={file.id}
-                    className="relative text-xs bg-gray-50 px-2 py-2 rounded overflow-hidden"
-                >
-                    {/* Blurred content */}
-                    <div
-                    className={`${
-                        project.status !== "paid" ? "blur-sm" : ""
-                    } select-none pointer-events-none`}
-                    >
-                    {file.file_name} (
-                    {(file.file_size / 1024).toFixed(1)} KB)
-                    </div>
-
-                    {/* Lock overlay */}
-                    {!project.paid_at && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/60">
-                        <span className="text-[10px] font-medium text-gray-700">
-                        🔒 Locked until payment
-                        </span>
-                    </div>
-                    )}
-
-                    {project.status === "paid" && (
-                    <button
-                        onClick={async () => {
-                        const res = await fetch("/api/files/download", {
-                            method: "POST",
-                            body: JSON.stringify({ projectId: project.id }),
-                        })
-
-                        const data = await res.json()
-
-                        if (data.files) {
-                            data.files.forEach((f) => {
-                            if (f.download_url) {
-                                window.open(f.download_url, "_blank")
-                            }
-                            })
-                        }
-                        }}
-                        className="mt-2 text-xs text-blue-600 underline"
-                    >
-                        Download
-                    </button>
-                    )}
-                </div>
-                ))
-            )}
-                {!project.paid_at && (
-    <button className="w-full bg-black text-white py-2 rounded-lg text-sm mt-2">
-        Pay & Unlock Files
-    </button>
-    )}
-            </div>
-
-
-        </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#F1EFE8]">
+        <p className="text-sm text-[#888780]">Loading files…</p>
+      </div>
     )
+  }
+
+  if (!project) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F1EFE8]">
+        <p className="text-sm text-red-600">Project not found.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F1EFE8] flex justify-center px-4 py-8">
+      <div className="w-full max-w-xl space-y-5">
+        {/* Header */}
+        <div className="bg-white p-6 rounded-2xl border border-[#E4E1D6] space-y-3 shadow-sm">
+          <div className="space-y-1">
+            <p className="text-[11px] font-medium tracking-[0.14em] text-[#888780] uppercase">
+              Solva portal
+            </p>
+            <h1 className="text-lg font-semibold text-[#26215C]">
+              Your files are ready.
+            </h1>
+            <p className="text-sm text-[#888780]">
+              {project.status === "paid"
+                ? "Payment confirmed. You can download your files."
+                : "Complete payment to unlock and download."}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between gap-4 pt-1">
+            <p className="text-sm text-[#2C2C2A]">
+              Invoice · ₹{Number(project.invoice_amount).toLocaleString()}
+            </p>
+            <div>
+              {project.status === "paid" ? (
+                <span className="text-[11px] px-3 py-1 rounded-full bg-[#E1F5EE] text-[#085641]">
+                  Paid
+                </span>
+              ) : (
+                <span className="text-[11px] px-3 py-1 rounded-full bg-[#F1EFE8] text-[#2C2C2A]">
+                  Awaiting payment
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Files */}
+        <div className="bg-white p-6 rounded-2xl border border-[#E4E1D6] space-y-3 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium text-[#2C2C2A]">Files</h2>
+            {project.status !== "paid" && (
+              <span className="text-[11px] text-[#888780]">
+                Locked until payment
+              </span>
+            )}
+          </div>
+
+          {files.length === 0 ? (
+            <p className="text-xs text-[#888780]">
+              No files uploaded yet. Your creator will add files here.
+            </p>
+          ) : (
+            files.map((file) => (
+              <div
+                key={file.id}
+                className="relative text-xs bg-[#F9F8F3] px-3 py-2 rounded-lg overflow-hidden"
+              >
+                {/* Blurred content */}
+                <div
+                  className={`${
+                    project.status !== "paid" ? "blur-sm" : ""
+                  } select-none pointer-events-none text-[#2C2C2A]`}
+                >
+                  {file.file_name} ({(file.file_size / 1024).toFixed(1)} KB)
+                </div>
+
+                {/* Lock overlay */}
+                {!project.paid_at && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+                    <span className="text-[10px] font-medium text-[#2C2C2A]">
+                      🔒 Locked until payment
+                    </span>
+                  </div>
+                )}
+
+                {project.status === "paid" && (
+                  <button
+                    onClick={async () => {
+                      const res = await fetch("/api/files/download", {
+                        method: "POST",
+                        body: JSON.stringify({ projectId: project.id }),
+                      })
+
+                      const data = await res.json()
+
+                      if (data.files) {
+                        data.files.forEach((f) => {
+                          if (f.download_url) {
+                            window.open(f.download_url, "_blank")
+                          }
+                        })
+                      }
+                    }}
+                    className="mt-2 inline-flex text-[11px] font-medium text-[#3C3489] hover:text-[#26215C] underline decoration-[#7F77DD]/60"
+                  >
+                    Download
+                  </button>
+                )}
+              </div>
+            ))
+          )}
+
+          {!project.paid_at && (
+            <button className="mt-3 w-full bg-[#3C3489] text-white py-2.5 rounded-lg text-sm font-medium shadow-sm hover:bg-[#26215C] transition-colors">
+              Pay &amp; unlock files
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }
