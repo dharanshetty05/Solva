@@ -15,14 +15,14 @@ export default function DashboardCard({ projects, onNewProject }) {
     .reduce((sum, p) => sum + Number(p.invoice_amount || 0), 0)
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E4E1D6] p-6 space-y-6 shadow-sm">
+    <div className="card p-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div className="space-y-1">
-          <h2 className="text-base font-semibold text-[#2C2C2A]">
+          <h2 className="text-base font-semibold text-[color:var(--foreground)]">
             My projects
           </h2>
-          <p className="text-xs text-[#888780]">
+          <p className="text-xs text-[color:var(--muted)]">
             Lock files. Share a link. Get paid.
           </p>
         </div>
@@ -30,7 +30,7 @@ export default function DashboardCard({ projects, onNewProject }) {
         <button
           type="button"
           onClick={onNewProject}
-          className="inline-flex items-center gap-1 rounded-lg bg-[#3C3489] px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-[#26215C] transition-colors"
+          className="inline-flex items-center gap-1 rounded-xl bg-[color:var(--primary)] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[color:var(--primary-hover)] transition-colors focus-ring"
         >
           <span className="text-sm leading-none">+</span>
           <span>New project</span>
@@ -49,9 +49,9 @@ export default function DashboardCard({ projects, onNewProject }) {
       </div>
 
       {/* List */}
-      <div className="space-y-3 pt-2 border-t border-[#E4E1D6]">
+      <div className="space-y-3 pt-2 border-t border-[color:var(--border)]">
         {projects.length === 0 ? (
-          <p className="text-sm text-[#888780]">
+          <p className="text-sm text-[color:var(--muted)]">
             No projects yet. Create one to lock files behind payment.
           </p>
         ) : (
@@ -66,15 +66,15 @@ export default function DashboardCard({ projects, onNewProject }) {
 
 function StatBox({ label, value, green, yellow }) {
   return (
-    <div className="rounded-xl p-4 border border-[#E4E1D6] bg-[#F9F8F3]">
-      <p className="text-xs font-medium text-[#888780]">{label}</p>
+    <div className="rounded-xl p-4 border border-[color:var(--border)] bg-[color:var(--surface)]">
+      <p className="text-xs font-medium text-[color:var(--muted)]">{label}</p>
       <p
         className={`text-lg font-semibold ${
           green
-            ? "text-[#085641]"
+            ? "text-[color:var(--success-text)]"
             : yellow
-            ? "text-[#7F77DD]"
-            : "text-[#2C2C2A]"
+            ? "text-[color:var(--accent-value)]"
+            : "text-[color:var(--foreground)]"
         }`}
       >
         {value}
@@ -86,6 +86,13 @@ function StatBox({ label, value, green, yellow }) {
 function ProjectRow({ project }) {
   const [uploading, setUploading] = useState(false)
   const [files, setFiles] = useState([])
+  const isLocked = project.status !== "paid"
+  const dotClass =
+    project.status === "paid"
+      ? "bg-[color:var(--success-text)]"
+      : project.status === "awaiting_payment"
+      ? "bg-[color:var(--accent-value)]"
+      : "bg-[color:var(--muted)]"
 
   useEffect(() => {
     async function fetchFiles() {
@@ -137,7 +144,7 @@ function ProjectRow({ project }) {
   const getStatus = () => {
     if (project.status === "paid") {
       return (
-        <span className="text-[11px] px-3 py-1 rounded-full bg-[#E1F5EE] text-[#085641]">
+        <span className="badge-paid">
           Paid · Delivered
         </span>
       )
@@ -145,29 +152,29 @@ function ProjectRow({ project }) {
 
     if (project.status === "awaiting_payment") {
       return (
-        <span className="text-[11px] px-3 py-1 rounded-full bg-[#EEDDFE] text-[#3C3489]">
+        <span className="badge-awaiting">
           Awaiting payment
         </span>
       )
     }
 
     return (
-      <span className="text-[11px] px-3 py-1 rounded-full bg-[#F1EFE8] text-[#2C2C2A]">
+      <span className="badge-locked">
         Portal sent
       </span>
     )
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl bg-[#F9F8F3] border border-[#E4E1D6] px-4 py-3">
+    <div className="flex flex-col gap-3 rounded-xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-2 w-2 rounded-full bg-[#888780]" />
+          <div className={`h-2 w-2 rounded-full ${dotClass}`} />
           <div className="space-y-0.5">
-            <p className="text-sm font-medium text-[#2C2C2A]">
+            <p className="text-sm font-semibold text-[color:var(--foreground)]">
               {project.project_name}
             </p>
-            <p className="text-[11px] text-[#888780]">
+            <p className="text-[11px] text-[color:var(--muted)]">
               Invoice · ₹{Number(project.invoice_amount).toLocaleString()}
             </p>
           </div>
@@ -180,35 +187,43 @@ function ProjectRow({ project }) {
 
       <div className="space-y-1">
         {files.length === 0 ? (
-          <p className="text-xs text-[#888780]">No files uploaded.</p>
+          <p className="text-xs text-[color:var(--muted)]">No files uploaded.</p>
         ) : (
           files.map((file) => (
             <div
               key={file.id}
-              className="relative text-xs bg-[#F1EFE8] px-3 py-2 rounded-lg overflow-hidden"
+              className="relative rounded-xl border border-[color:var(--border)]/70 bg-[color:var(--surface)] px-4 py-3 overflow-hidden transition-colors hover:bg-[color:var(--card)]"
             >
               {/* Blurred content */}
-              <div className="blur-sm select-none pointer-events-none text-[#2C2C2A]">
+              <div
+                className={`${
+                  isLocked
+                    ? "blur-sm select-none pointer-events-none text-[color:var(--locked-text)]"
+                    : "text-[color:var(--foreground)]"
+                } text-xs leading-relaxed`}
+              >
                 {file.file_name} ({(file.file_size / 1024).toFixed(1)} KB)
               </div>
 
               {/* Lock overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-white/60">
-                <span className="text-[10px] font-medium text-[#2C2C2A]">
-                  🔒 Locked until payment
-                </span>
-              </div>
+              {isLocked && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+                  <span className="rounded-full border border-[color:var(--border)]/70 bg-white/70 px-3 py-1 text-[11px] font-semibold text-[color:var(--locked-text)]">
+                    🔒 Locked until payment
+                  </span>
+                </div>
+              )}
             </div>
           ))
         )}
       </div>
 
       {project.status !== "paid" ? (
-        <p className="text-xs text-[#888780]">
+        <p className="text-xs text-[color:var(--muted)]">
           Files are locked. Client must pay to unlock.
         </p>
       ) : (
-        <p className="text-xs text-[#085641]">
+        <p className="text-xs text-[color:var(--success-text)]">
           Payment received. Files unlocked.
         </p>
       )}
@@ -217,16 +232,17 @@ function ProjectRow({ project }) {
         <input
           value={`${location.origin}/p/${project.portal_slug}`}
           readOnly
-          className="text-xs border border-[#E4E1D6] bg-white px-2.5 py-1.5 rounded-lg w-full text-[#2C2C2A]"
+          className="w-full rounded-xl border border-[color:var(--border)] bg-white px-3 py-2 text-xs text-[color:var(--foreground)] focus-ring"
         />
 
         <button
+          type="button"
           onClick={() => {
             navigator.clipboard.writeText(
               `${location.origin}/p/${project.portal_slug}`
             )
           }}
-          className="text-xs px-2.5 py-1.5 border border-[#E4E1D6] rounded-lg text-[#26215C] hover:bg-[#EEDDFE] hover:border-[#7F77DD] transition-colors font-medium"
+          className="rounded-xl border border-[color:var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[color:var(--primary)] transition-colors hover:bg-[color:var(--accent-bg)] hover:border-[color:var(--accent-value)] focus-ring"
         >
           Copy
         </button>
@@ -234,24 +250,29 @@ function ProjectRow({ project }) {
 
       {/* Upload */}
       <div>
-        <div className="border border-dashed border-[#E4E1D6] rounded-lg p-4 text-center text-xs text-[#888780] bg-white">
+        <div className="border border-dashed border-[color:var(--border)] rounded-xl p-4 text-center text-xs text-[color:var(--muted)] bg-white transition-colors hover:bg-[color:var(--surface)]">
           <input
             type="file"
             multiple
             onChange={handleFileUpload}
             className="hidden"
             id={`upload-${project.id}`}
+            disabled={uploading}
           />
 
           <label
             htmlFor={`upload-${project.id}`}
-            className="cursor-pointer text-[#3C3489] font-medium"
+            className={`cursor-pointer font-semibold text-[color:var(--primary)] ${
+              uploading
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:underline focus-ring"
+            }`}
           >
             Click to upload or drag files here
           </label>
         </div>
         {uploading && (
-          <p className="text-xs text-[#7F77DD] mt-1">
+          <p className="text-xs text-[color:var(--accent-value)] mt-1 animate-pulse">
             Uploading files…
           </p>
         )}

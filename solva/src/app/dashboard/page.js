@@ -16,14 +16,19 @@ export default function Dashboard() {
 
     useEffect(() => {
         async function init() {
-            const { data } = await supabase.auth.getUser()
-            if (!data.user) {
-                router.push("/login")
-                return
+            setLoading(true)
+            try {
+                const { data } = await supabase.auth.getUser()
+                if (!data.user) {
+                    router.push("/login")
+                    return
+                }
+                setUser(data.user)
+                const { data: projectsData } = await getProjects()
+                setProjects(projectsData || [])
+            } finally {
+                setLoading(false)
             }
-            setUser(data.user)
-            const { data: projectsData } = await getProjects()
-            setProjects(projectsData || [])
         }
         init()
     }, [])
@@ -43,29 +48,37 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#F1EFE8]">
-                <p className="text-sm text-[#888780]">Loading dashboard…</p>
+            <div className="min-h-screen bg-[color:var(--background)] flex items-center justify-center px-4">
+                <div className="w-full max-w-4xl space-y-6">
+                    <div className="h-7 w-52 rounded-lg bg-white/60 animate-pulse" />
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="h-28 rounded-2xl bg-white/60 animate-pulse" />
+                        <div className="h-28 rounded-2xl bg-white/60 animate-pulse" />
+                        <div className="h-28 rounded-2xl bg-white/60 animate-pulse" />
+                    </div>
+                    <div className="h-24 rounded-2xl bg-white/60 animate-pulse" />
+                </div>
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen bg-[#F1EFE8]">
+        <div className="min-h-screen bg-[color:var(--background)]">
             <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
                 {/* Header */}
                 <header className="flex items-center justify-between">
                     <div className="space-y-1">
-                        <p className="text-[11px] font-medium tracking-[0.14em] text-[#888780] uppercase">
+                        <p className="text-[11px] font-medium tracking-[0.14em] text-[color:var(--muted)] uppercase">
                             Solva
                         </p>
-                        <h1 className="text-xl font-semibold text-[#26215C]">
+                        <h1 className="text-xl font-semibold text-[color:var(--foreground)]">
                             Your projects, under control.
                         </h1>
                     </div>
                     <button
                         type="button"
                         onClick={handleLogout}
-                        className="text-xs font-medium text-[#888780] hover:text-[#2C2C2A] transition-colors"
+                        className="text-xs font-semibold text-[color:var(--muted)] hover:text-[color:var(--foreground)] transition-colors focus-ring rounded-xl px-3 py-2"
                     >
                         Logout
                     </button>

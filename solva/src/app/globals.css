@@ -1,15 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f5f4;
-  --foreground: #111827;
+  /* Core palette */
+  --background: #f6f5f1;
+  --foreground: #0f172a;
+  --muted: #6b7280;
+  --border: #e4e1d6;
+  --surface: #f9f8f3;
+  --card: #ffffff;
+
+  /* Primary (brand) */
+  --primary: #3c3489;
+  --primary-hover: #26215c;
+
+  /* Status colors */
+  --success-bg: #e1f5ee;
+  --success-text: #085641;
+  --accent-bg: #eeddfe;
+  --accent-text: #3c3489;
+  --accent-value: #7f77dd;
+  --locked-bg: #f1efe8;
+  --locked-text: #2c2c2a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+html {
+  background: var(--background);
+  color: var(--foreground);
 }
 
 body {
@@ -17,4 +42,62 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
+}
+
+@layer base {
+  /* Smoother rendering and consistent focus */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: rgba(60, 52, 137, 0.22);
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--background)];
+  }
+
+  .card {
+    @apply rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] shadow-sm;
+  }
+
+  .card-surface {
+    @apply rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] shadow-sm;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-[color:var(--primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[color:var(--primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--background)] disabled:cursor-not-allowed disabled:opacity-70;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-[color:var(--border)] bg-white px-4 py-2.5 text-sm font-semibold text-[color:var(--foreground)] shadow-sm transition-colors hover:bg-[color:var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--background)];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-xl px-3 py-2.5 text-sm font-semibold text-[color:var(--muted)] transition-colors hover:text-[color:var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--background)];
+  }
+
+  .input {
+    @apply block w-full rounded-xl border border-[color:var(--border)] bg-white px-3 py-2.5 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] outline-none transition-shadow;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--background)];
+  }
+
+  .badge {
+    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-semibold;
+  }
+
+  .badge-paid {
+    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-semibold bg-[color:var(--success-bg)] text-[color:var(--success-text)];
+  }
+
+  .badge-awaiting {
+    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-semibold bg-[color:var(--accent-bg)] text-[color:var(--accent-text)];
+  }
+
+  .badge-locked {
+    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-semibold bg-[color:var(--locked-bg)] text-[color:var(--locked-text)];
+  }
 }
