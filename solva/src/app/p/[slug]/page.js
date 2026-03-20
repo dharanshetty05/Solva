@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 
 export default function PortalPage() {
-    const { slug } = useParams()
+  const { slug } = useParams()
+  const searchParams = useSearchParams();
+  const mockPayment = searchParams.get("mock_payment");
 
-    const [project, setProject] = useState(null)
-    const [files, setFiles] = useState([])
-    const [loading, setLoading] = useState(true)
+  const [project, setProject] = useState(null)
+  const [files, setFiles] = useState([])
+  const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
+    // useEffect for Data fetching
+  useEffect(() => {
         async function fetchData() {
         // 1. Get project by slug
         const { data: projectData } = await supabase
@@ -39,7 +42,29 @@ export default function PortalPage() {
         }
 
         if (slug) fetchData()
-    }, [slug])
+  }, [slug])
+
+  // useEffect for mock payment
+  useEffect(() => {
+    if (mockPayment && project) {
+      fetch("/api/mock/confirm-payment", {
+        method: "POST",
+        body: JSON.stringify({ projectId: project.id }),
+      }).then(() => {
+        window.location.href = `/p/${project.portal_slug}`;
+      });
+    }
+  }, [mockPayment, project]);
+
+  const handlePay = async () => {
+    const res = await fetch("/api/payments/create", {
+      method: "POST",
+      body: JSON.stringify({ projectId: project.id }),
+    });
+
+    const data = await res.json();
+    window.location.href = data.url;
+  };
 
   if (loading) {
     return (
@@ -70,7 +95,7 @@ export default function PortalPage() {
               Your files are ready.
             </h1>
             <p className="text-sm text-[#888780]">
-              {project.status === "paid"
+              {project.paid_at
                 ? "Payment confirmed. You can download your files."
                 : "Complete payment to unlock and download."}
             </p>
@@ -81,7 +106,7 @@ export default function PortalPage() {
               Invoice · ₹{Number(project.invoice_amount).toLocaleString()}
             </p>
             <div>
-              {project.status === "paid" ? (
+              {project.paid_at ? (
                 <span className="text-[11px] px-3 py-1 rounded-full bg-[#E1F5EE] text-[#085641]">
                   Paid
                 </span>
@@ -133,7 +158,7 @@ export default function PortalPage() {
                   </div>
                 )}
 
-                {project.status === "paid" && (
+                {project.paid_at && (
                   <button
                     onClick={async () => {
                       const res = await fetch("/api/files/download", {
@@ -161,7 +186,7 @@ export default function PortalPage() {
           )}
 
           {!project.paid_at && (
-            <button className="mt-3 w-full bg-[#3C3489] text-white py-2.5 rounded-lg text-sm font-medium shadow-sm hover:bg-[#26215C] transition-colors">
+            <button onClick={handlePay} className="mt-3 w-full bg-[#3C3489] text-white py-2.5 rounded-lg text-sm font-medium shadow-sm hover:bg-[#26215C] transition-colors">
               Pay &amp; unlock files
             </button>
           )}
