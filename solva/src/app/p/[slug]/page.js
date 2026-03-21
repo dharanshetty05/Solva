@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { Lock } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useParams, useSearchParams } from "next/navigation"
 
@@ -17,7 +19,6 @@ export default function PortalPage() {
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState(null)
 
-    // useEffect for Data fetching
   useEffect(() => {
         async function fetchData() {
         // 1. Get project by slug
@@ -78,6 +79,24 @@ export default function PortalPage() {
     }
   };
 
+  const isUnlocked = Boolean(project?.paid_at)
+  const invoiceAmount = Number(project?.invoice_amount || 0)
+  const freelancerName =
+    project?.freelancer_name ||
+    project?.creator_name ||
+    "Freelancer"
+  const freelancerLogoUrl =
+    project?.freelancer_logo_url ||
+    project?.creator_logo_url ||
+    null
+  const projectName = project?.project_name || "Project"
+
+  const formatINR = (value) =>
+    `₹${Number(value || 0).toLocaleString()}`
+
+  const formatFileSizeKB = (bytes) =>
+    `${(Number(bytes || 0) / 1024).toFixed(1)} KB`
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[color:var(--background)] px-4 py-10">
@@ -134,199 +153,247 @@ export default function PortalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[color:var(--background)] px-4 py-10">
+    <div className="min-h-screen bg-[color:var(--background)] px-4 py-10 pb-24">
       <div className="mx-auto max-w-5xl space-y-6">
         {/* Header */}
-        <div className="card p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-1">
-              <p className="text-[11px] font-medium tracking-[0.14em] text-[color:var(--muted)] uppercase">
-                Solva portal
-              </p>
-              <h1 className="text-lg font-semibold text-[color:var(--foreground)]">
-                {project.paid_at ? "Your files are ready." : "Unlock your files."}
-              </h1>
-              <p className="text-sm text-[color:var(--muted)]">
-                {project.paid_at
-                  ? "Payment confirmed. You can download your files."
-                  : "Complete payment to unlock and download."}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {project.paid_at ? (
-                <span className="badge-paid">Paid</span>
+        <header className="card p-6">
+          <div className="flex items-start gap-3">
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-[color:var(--primary)]">
+              {freelancerLogoUrl ? (
+                <img
+                  src={freelancerLogoUrl}
+                  alt={`${freelancerName} logo`}
+                  className="h-full w-full object-cover"
+                />
               ) : (
-                <span className="badge-awaiting">Awaiting payment</span>
+                <div className="h-full w-full flex items-center justify-center text-white font-bold">
+                  S
+                </div>
               )}
             </div>
-          </div>
 
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-medium text-[color:var(--foreground)]">
-              Invoice · ₹{Number(project.invoice_amount).toLocaleString()}
-            </p>
-            <p className="text-sm text-[color:var(--muted)]">
-              {project.paid_at
-                ? "Downloads are available below."
-                : "Files stay locked until payment is confirmed."}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          {/* Payment (dominant CTA) */}
-          <aside className="md:col-span-2 space-y-4">
-            <div className="card p-6">
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h2 className="text-sm font-semibold text-[color:var(--foreground)]">
-                      Payment
-                    </h2>
-                    <p className="text-xs text-[color:var(--muted)] mt-1">
-                      Secure checkout
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[11px] font-medium text-[color:var(--muted)] uppercase tracking-[0.08em]">
-                      Amount
-                    </p>
-                    <p className="text-2xl font-semibold text-[color:var(--foreground)]">
-                      ₹{Number(project.invoice_amount).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-
-                {project.paid_at ? (
-                  <div className="rounded-xl border border-[color:var(--border)]/70 bg-[color:var(--surface)] p-4">
-                    <p className="text-sm font-semibold text-[color:var(--success-text)]">
-                      Payment confirmed
-                    </p>
-                    <p className="text-xs text-[color:var(--muted)] mt-1">
-                      Your files are unlocked.
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <button
-                      onClick={handlePay}
-                      disabled={isPaying}
-                      className="w-full btn-primary"
-                    >
-                      {isPaying ? "Redirecting…" : "Pay & unlock files"}
-                    </button>
-                    <p className="text-[11px] leading-relaxed text-[color:var(--muted)]">
-                      Your creator will deliver downloads right after payment confirmation.
-                    </p>
-                    {payError && (
-                      <p className="text-xs font-medium text-red-600">
-                        {payError}
-                      </p>
-                    )}
-                  </>
-                )}
+            <div className="min-w-0 space-y-1">
+              <div className="text-sm font-bold text-[color:var(--foreground)] truncate">
+                {freelancerName}
+              </div>
+              <div className="text-xs text-[color:var(--muted)] truncate">
+                {projectName}
               </div>
             </div>
-          </aside>
+          </div>
+        </header>
 
-          {/* Files */}
-          <section className="md:col-span-3">
-            <div className="card p-6">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-[color:var(--foreground)]">
-                  Files
-                </h2>
-                {project.status !== "paid" && (
-                  <span className="text-xs text-[color:var(--muted)]">
-                    Locked until payment
-                  </span>
-                )}
-              </div>
+        {/* Files Section */}
+        <section className="card p-6" aria-label="Uploaded files">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold text-[color:var(--foreground)]">
+              Files
+            </h2>
+            {!isUnlocked && (
+              <span className="text-xs text-[color:var(--muted)]">
+                Locked until payment
+              </span>
+            )}
+          </div>
 
-              {files.length === 0 ? (
-                <div className="mt-4 rounded-xl border border-dashed border-[color:var(--border)] bg-[color:var(--surface)] p-6 text-center">
-                  <p className="text-sm font-medium text-[color:var(--foreground)]">
-                    No files uploaded yet
-                  </p>
-                  <p className="text-xs text-[color:var(--muted)] mt-1">
-                    Your creator will add files here.
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-4 space-y-3">
-                  {files.map((file) => (
-                    <div
-                      key={file.id}
-                      className="relative rounded-xl border border-[color:var(--border)]/70 bg-[color:var(--surface)] px-4 py-3 overflow-hidden transition-colors hover:bg-[color:var(--card)]"
+          {files.length === 0 ? (
+            <div className="mt-4 rounded-xl border border-dashed border-[color:var(--border)] bg-[color:var(--surface)] p-6 text-center">
+              <p className="text-sm font-medium text-[color:var(--foreground)]">
+                No files uploaded yet
+              </p>
+              <p className="text-xs text-[color:var(--muted)] mt-1">
+                Your creator will add files here.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {files.map((file) => (
+                <div
+                  key={file.id}
+                  className="relative rounded-xl border border-[color:var(--border)]/70 bg-[color:var(--surface)] px-4 py-3 overflow-hidden transition-colors hover:bg-[color:var(--card)]"
+                >
+                  <div className="space-y-1">
+                    <motion.div
+                      className={`text-sm font-semibold leading-relaxed ${
+                        !isUnlocked ? "pointer-events-none select-none" : ""
+                      }`}
+                      initial={{ filter: "blur(8px)", opacity: 0.95 }}
+                      animate={{
+                        filter: isUnlocked ? "blur(0px)" : "blur(8px)",
+                        opacity: 1,
+                      }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      style={{ color: isUnlocked ? "var(--foreground)" : "var(--locked-text)" }}
                     >
-                      {/* Blurred content (locked state) */}
-                      <div
-                        className={`${
-                          !project.paid_at
-                            ? "blur-sm select-none pointer-events-none text-[color:var(--locked-text)]"
-                            : "text-[color:var(--foreground)]"
-                        } text-xs leading-relaxed`}
+                      {file.file_name}
+                    </motion.div>
+                    <motion.div
+                      className={`text-xs leading-relaxed ${
+                        !isUnlocked ? "pointer-events-none select-none" : ""
+                      }`}
+                      initial={{ filter: "blur(8px)", opacity: 0.95 }}
+                      animate={{
+                        filter: isUnlocked ? "blur(0px)" : "blur(8px)",
+                        opacity: 1,
+                      }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      style={{
+                        color: isUnlocked ? "var(--muted)" : "var(--locked-text)",
+                      }}
+                    >
+                      {formatFileSizeKB(file.file_size)}
+                    </motion.div>
+                  </div>
+
+                  <AnimatePresence>
+                    {!isUnlocked && (
+                      <motion.div
+                        initial={{ opacity: 1 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-sm"
                       >
-                        {file.file_name} ({(file.file_size / 1024).toFixed(1)} KB)
-                      </div>
-
-                      {!project.paid_at && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm">
-                          <span className="rounded-full border border-[color:var(--border)]/70 bg-white/70 px-3 py-1 text-[11px] font-semibold text-[color:var(--locked-text)]">
-                            🔒 Locked until payment
-                          </span>
+                        <div className="flex items-center gap-2 rounded-full border border-[color:var(--border)]/70 bg-white/70 px-3 py-1 text-[11px] font-semibold text-[color:var(--locked-text)]">
+                          <Lock size={14} />
+                          Locked until payment
                         </div>
-                      )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                      {project.paid_at && (
-                        <button
-                          disabled={isDownloading}
-                          onClick={async () => {
-                            setDownloadError(null)
-                            if (isDownloading) return
-                            setIsDownloading(true)
-                            try {
-                              const res = await fetch("/api/files/download", {
-                                method: "POST",
-                                body: JSON.stringify({ projectId: project.id }),
-                              })
+                  {isUnlocked && (
+                    <motion.button
+                      disabled={isDownloading}
+                      onClick={async () => {
+                        setDownloadError(null)
+                        if (isDownloading) return
+                        setIsDownloading(true)
+                        try {
+                          const res = await fetch("/api/files/download", {
+                            method: "POST",
+                            body: JSON.stringify({ projectId: project.id }),
+                          })
 
-                              const data = await res.json()
+                          const data = await res.json()
 
-                              if (data.files) {
-                                data.files.forEach((f) => {
-                                  if (f.download_url) {
-                                    window.open(f.download_url, "_blank")
-                                  }
-                                })
+                          if (data.files) {
+                            data.files.forEach((f) => {
+                              if (f.download_url) {
+                                window.open(f.download_url, "_blank")
                               }
-                            } catch (e) {
-                              setDownloadError(
-                                "Could not start download. Please try again."
-                              )
-                            } finally {
-                              setIsDownloading(false)
-                            }
-                          }}
-                          className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-[color:var(--border)] bg-white px-4 py-2 text-xs font-semibold text-[color:var(--primary)] transition-colors hover:bg-[color:var(--surface)] disabled:opacity-70 disabled:cursor-not-allowed focus-ring"
-                        >
-                          {isDownloading ? "Preparing…" : "Download"}
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                            })
+                          }
+                        } catch (e) {
+                          setDownloadError(
+                            "Could not start download. Please try again."
+                          )
+                        } finally {
+                          setIsDownloading(false)
+                        }
+                      }}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, ease: "easeOut" }}
+                      className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-[color:var(--border)] bg-white px-4 py-2 text-xs font-semibold text-[color:var(--primary)] transition-colors hover:bg-[color:var(--surface)] disabled:opacity-70 disabled:cursor-not-allowed focus-ring"
+                    >
+                      {isDownloading ? "Preparing…" : "Download"}
+                    </motion.button>
+                  )}
                 </div>
-              )}
-
-              {downloadError && (
-                <p className="mt-4 text-xs font-medium text-red-600">
-                  {downloadError}
-                </p>
-              )}
+              ))}
             </div>
-          </section>
-        </div>
+          )}
+
+          {downloadError && (
+            <p className="mt-4 text-xs font-medium text-red-600">
+              {downloadError}
+            </p>
+          )}
+        </section>
+
+        {/* Payment Section */}
+        <section className="card p-6" aria-label="Payment">
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <h2 className="text-sm font-semibold text-[color:var(--foreground)]">
+                {projectName}
+              </h2>
+              <p className="text-xs text-[color:var(--muted)]">
+                Total amount
+              </p>
+            </div>
+
+            <div className="flex items-baseline justify-between gap-4">
+              <p className="text-xs font-medium text-[color:var(--muted)] uppercase tracking-[0.08em]">
+                Amount
+              </p>
+              <p className="text-3xl font-semibold text-[color:var(--foreground)]">
+                {formatINR(invoiceAmount)}
+              </p>
+            </div>
+
+            {isUnlocked ? (
+              <div className="rounded-xl border border-[color:var(--border)]/70 bg-[color:var(--surface)] p-4">
+                <p className="text-sm font-semibold text-[color:var(--success-text)]">
+                  Payment confirmed
+                </p>
+                <p className="text-xs text-[color:var(--muted)] mt-1">
+                  Your files are unlocked.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="hidden md:block">
+                  <button
+                    onClick={handlePay}
+                    disabled={isPaying}
+                    className="w-full btn-primary text-base py-3.5"
+                  >
+                    {isPaying
+                      ? "Redirecting…"
+                      : `Pay ${formatINR(invoiceAmount)} to unlock files`}
+                  </button>
+                </div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="fixed left-0 right-0 bottom-0 z-50 bg-[color:var(--background)]/80 backdrop-blur-md border-t border-[color:var(--border)] px-4 py-3 md:hidden"
+                >
+                  <button
+                    onClick={handlePay}
+                    disabled={isPaying}
+                    className="w-full btn-primary text-base py-3.5"
+                  >
+                    {isPaying
+                      ? "Redirecting…"
+                      : `Pay ${formatINR(invoiceAmount)} to unlock files`}
+                  </button>
+                  <p className="text-center text-[11px] leading-relaxed text-[color:var(--muted)] mt-1">
+                    Secure payment • Instant access
+                  </p>
+                </motion.div>
+
+                <p className="hidden md:block text-[11px] leading-relaxed text-[color:var(--muted)]">
+                  Secure payment • Instant access
+                </p>
+                {payError && (
+                  <p className="text-xs font-medium text-red-600">
+                    {payError}
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+        </section>
+
+        <footer className="pt-2 pb-6">
+          <p className="text-center text-[11px] text-[color:var(--muted)]">
+            Powered by Solva
+          </p>
+        </footer>
       </div>
     </div>
   )
