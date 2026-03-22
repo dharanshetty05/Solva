@@ -24,7 +24,7 @@ export async function POST(req) {
   await supabase
     .from("projects")
     .update({
-      payment_provider: "mock",
+      payment_provider: process.env.PAYMENT_PROVIDER || "mock",
       payment_id: paymentId,
     })
     .eq("id", projectId);

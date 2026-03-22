@@ -2,59 +2,65 @@ import { createClient } from "@supabase/supabase-js"
 
 export async function POST(req) {
     try {
-        const { projectId } = await req.json()
+        const { projectId, portalSlug, fileId } = await req.json()
 
-        // Create admin client (server-side only)
         const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL,
         process.env.SUPABASE_SERVICE_ROLE_KEY
         )
 
-        // 1. Get project
+        // 1. Validate project
         const { data: project, error: projectError } = await supabase
         .from("projects")
         .select("*")
         .eq("id", projectId)
+        .eq("portal_slug", portalSlug)
         .single()
 
         if (projectError || !project) {
-        return Response.json({ error: "Project not found" }, { status: 404 })
-        }
-
-        // 2. Check payment
-        if (!project.paid_at) {
-        return Response.json(
-            { error: "Payment required" },
+        return new Response(
+            JSON.stringify({ error: "Invalid project access" }),
             { status: 403 }
         )
         }
 
-        // 3. Get files
-        const { data: files } = await supabase
-        .from("files")
-        .select("*")
-        .eq("project_id", projectId)
-
-        if (!files || files.length === 0) {
-            return Response.json({ files: [] })
+        if (!project.paid_at) {
+        return new Response(
+            JSON.stringify({ error: "Payment required" }),
+            { status: 403 }
+        )
         }
 
-        // 4. Generate signed URLs (24h)
-        const filesWithUrls = await Promise.all(
-        files.map(async (file) => {
-            const { data } = await supabase.storage
-            .from("project-files")
-            .createSignedUrl(file.file_path, 60 * 60 * 24)
+        // 2. Get ONE file
+        const { data: file } = await supabase
+        .from("files")
+        .select("*")
+        .eq("id", fileId)
+        .eq("project_id", projectId)
+        .single()
 
-            return {
-            ...file,
-            download_url: data?.signedUrl || null,
-            }
-        })
+        if (!file) {
+        return new Response(
+            JSON.stringify({ error: "File not found" }),
+            { status: 404 }
         )
+        }
 
-        return Response.json({ files: filesWithUrls })
+        // 3. Generate signed URL (10 min instead of 24h)
+        const { data } = await supabase.storage
+        .from("project-files")
+        .createSignedUrl(file.file_path, 60 * 10)
+
+        return new Response(
+        JSON.stringify({
+            download_url: data?.signedUrl || null,
+        }),
+        { status: 200 }
+        )
     } catch (err) {
-        return Response.json({ error: err.message }, { status: 500 })
+        return new Response(
+        JSON.stringify({ error: err.message }),
+        { status: 500 }
+        )
     }
 }

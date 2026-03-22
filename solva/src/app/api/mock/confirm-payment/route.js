@@ -2,6 +2,12 @@ import { createClient } from "@supabase/supabase-js";
 import { handlePaymentSuccess } from "@/lib/payments/handleWebhook";
 
 export async function POST(req) {
+  if (process.env.NODE_ENV === "production") {
+    return new Response(
+      JSON.stringify({ error: "Not allowed in production" }),
+      { status: 403 }
+    );
+  }
   const { projectId } = await req.json();
 
   const supabase = createClient(
