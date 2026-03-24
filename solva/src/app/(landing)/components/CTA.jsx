@@ -4,6 +4,7 @@ import Link from "next/link"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { useRef } from "react"
 import { ArrowRight } from "lucide-react"
+import { useState } from "react"
 
 const stagger = {
   show: { transition: { staggerChildren: 0.1 } },
@@ -20,6 +21,10 @@ const fadeUp = {
 }
 
 export default function CTA() {
+  const [email, setEmail] = useState("")
+  const [submitted, setSubmitted] = useState(false)
+
+
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -75,8 +80,12 @@ export default function CTA() {
 
           {/* Scenario lines */}
           <motion.div variants={fadeUp} className="mb-10 space-y-1.5">
-            <p className="text-base text-[#5E5C82] md:text-lg">You just finished a $4,000 brand project.</p>
-            <p className="text-base text-[#5E5C82] md:text-lg">You're about to hit send.</p>
+            <p className="text-base text-[#5E5C82] md:text-lg">
+  Your files are ready to be delivered.
+</p>
+<p className="text-base text-[#5E5C82] md:text-lg">
+  Access is about to be shared.
+</p>
           </motion.div>
 
           {/* Decision headline */}
@@ -84,10 +93,10 @@ export default function CTA() {
             variants={fadeUp}
             className="mb-14 max-w-2xl text-[2.2rem] font-bold leading-[1.08] tracking-[-0.04em] text-white md:text-[3.5rem]"
           >
-            Is this the last time you send it{" "}
-            <span className="bg-gradient-to-r from-[#A09FD4] to-[#7F77DD] bg-clip-text text-transparent">
-              without leverage?
-            </span>
+            Will you deliver files{" "}
+<span className="bg-gradient-to-r from-[#A09FD4] to-[#7F77DD] bg-clip-text text-transparent">
+  or control access?
+</span>
           </motion.h2>
 
           {/* CTA button */}
@@ -97,25 +106,53 @@ export default function CTA() {
               whileTap={{ scale: 0.97 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
             >
-              <Link
-                href="/login"
-                className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-xl bg-[#534AB7] px-10 py-4 text-sm font-semibold text-white shadow-[0_0_48px_rgba(83,74,183,0.55)] transition-shadow duration-300 hover:shadow-[0_0_72px_rgba(83,74,183,0.75)] md:text-base"
-              >
-                {/* Shimmer sweep on hover */}
-                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent transition-transform duration-500 group-hover:translate-x-full" />
-                Try Solva free
-                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} />
-              </Link>
+
+<form
+  onSubmit={(e) => {
+    e.preventDefault()
+    setSubmitted(true)
+    setEmail("")
+  }}
+  className="flex flex-col sm:flex-row items-center justify-center gap-3"
+>
+  {submitted ? (
+    <p className="text-green-400 text-sm">
+      You're on the waitlist 🚀
+    </p>
+  ) : (
+    <>
+      <input
+        type="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Enter your email"
+        className="w-72 rounded-xl bg-[#0E0C25] border border-white/[0.08] px-4 py-3 text-sm text-white placeholder:text-[#4E4C70] outline-none focus:border-[#534AB7]"
+      />
+
+      <button
+        type="submit"
+        className="group inline-flex items-center gap-2.5 rounded-xl bg-[#534AB7] px-8 py-3 text-sm font-semibold text-white"
+      >
+        Join waitlist
+      </button>
+    </>
+  )}
+</form>
+
             </motion.div>
           </motion.div>
 
           {/* Sub-copy */}
+        { !submitted ? (
           <motion.p
             variants={fadeUp}
             className="mt-5 text-sm text-[#3E3C5C]"
           >
-            No credit card required
+            Join the waitlist. No setup required.
           </motion.p>
+          ) : <p></p>
+        }
 
         </motion.div>
       </div>

@@ -7,8 +7,8 @@ import { Ban, Lock, MessageSquareOff, Repeat } from "lucide-react"
 const benefits = [
   {
     icon: Ban,
-    title: "You don't chase payments.",
-    body: "The system handles it. Pay or no files. That's the entire dynamic.",
+    title: "No manual payment follow-ups",
+    body: "Access is automatically restricted until payment is completed. The system enforces it for you.",
     index: "01",
     accentColor: "#534AB7",
     accentGlow: "rgba(83,74,183,0.22)",
@@ -17,8 +17,8 @@ const benefits = [
   },
   {
     icon: Lock,
-    title: "Your work doesn't float around unpaid.",
-    body: "Until they pay, nothing is usable.",
+    title: "Files stay protected until payment",
+    body: "All files remain locked and inaccessible until the required payment is successfully processed.",
     index: "02",
     accentColor: "#534AB7",
     accentGlow: "rgba(83,74,183,0.22)",
@@ -27,8 +27,8 @@ const benefits = [
   },
   {
     icon: MessageSquareOff,
-    title: "You don't have awkward conversations.",
-    body: "The process is the conversation. You stay the professional throughout.",
+    title: "No back-and-forth required",
+    body: "Payment and access are handled within the same flow, eliminating the need for manual coordination.",
     index: "03",
     accentColor: "#534AB7",
     accentGlow: "rgba(83,74,183,0.22)",
@@ -37,8 +37,8 @@ const benefits = [
   },
   {
     icon: Repeat,
-    title: "Nothing about your workflow changes.",
-    body: "You deliver through Solva instead of email. That's it.",
+    title: "Works with your existing process",
+    body: "Use the same workflow you already follow — simply deliver through a secure, payment-gated link.",
     index: "04",
     accentColor: "#1D9E75",
     accentGlow: "rgba(29,158,117,0.2)",
@@ -145,7 +145,7 @@ export default function Benefits() {
         >
           <span className="h-px w-8 bg-[#534AB7]" />
           <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#534AB7]">
-            How you operate now
+            System benefits
           </span>
         </motion.div>
 
@@ -157,7 +157,7 @@ export default function Benefits() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="mb-16 max-w-xl text-[2rem] font-bold leading-[1.1] tracking-[-0.035em] text-white md:text-[2.8rem]"
         >
-          How you operate now
+          What changes when access is automated
         </motion.h2>
 
         {/* 2×2 grid */}
@@ -179,8 +179,8 @@ export default function Benefits() {
             <span className="h-px w-12 bg-gradient-to-r from-[#534AB7] to-transparent" />
           </div>
           <p className="text-lg font-semibold leading-relaxed text-[#5E5C82] md:text-xl">
-            You do the work. You get paid for it.{" "}
-            <span className="text-white">Every time.</span>
+            Payment and delivery are handled together.{" "}
+<span className="text-white">Access is granted only after payment is complete.</span>
           </p>
         </motion.div>
 

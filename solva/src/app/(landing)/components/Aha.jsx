@@ -188,15 +188,15 @@ function UnlockVisual() {
 
 /* ── Main section ── */
 export default function Aha() {
-  const lines = [
-    { text: "Your client opens the link. The files are there — blurred, locked, one step away.", type: "body" },
-    { text: "They pay.",                                                                          type: "body" },
-    { text: "Within seconds — the blur lifts.",                                                   type: "peak" },
-    { text: "Every file snaps into focus. They download everything. You get notified.",           type: "body" },
-    { text: "No follow-up. No awkward email. No wondering.",                                      type: "body" },
-    { text: "You did the work. You got paid. You moved on.",                                      type: "bold" },
-    { text: "That's the whole thing.",                                                            type: "ghost" },
-  ]
+const lines = [
+  { text: "A secure link is opened. Files are visible — blurred, locked, access restricted.", type: "body" },
+  { text: "Payment is completed.", type: "body" },
+  { text: "Within seconds — access unlocks.", type: "peak" },
+  { text: "Every file becomes available instantly. Download access is granted automatically.", type: "body" },
+  { text: "No manual steps. No back-and-forth. No uncertainty.", type: "body" },
+  { text: "Delivery and payment happen in a single, seamless flow.", type: "bold" },
+  { text: "That's how it should work.", type: "ghost" },
+]
 
   return (
     <section className="relative overflow-hidden bg-[#07061A]">
@@ -230,7 +230,7 @@ export default function Aha() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="mb-16 max-w-2xl text-[2rem] font-bold leading-[1.1] tracking-[-0.035em] text-white md:text-[2.8rem]"
         >
-          This is what getting paid on delivery actually feels like.
+          This is what automated delivery with payment control feels like.
         </motion.h2>
 
         {/* Two-col layout */}
