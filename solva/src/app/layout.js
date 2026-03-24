@@ -12,9 +12,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Solva",
-  description: "Get paid. Files unlock.",
-};
+  title: "Solva — Secure file delivery with payment gating",
+  description: "Control access to your files and unlock them automatically after payment is completed.",
+}
 
 export default function RootLayout({ children }) {
   return (
