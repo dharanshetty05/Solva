@@ -9,12 +9,12 @@ const steps = [
     number: "01",
     icon: Upload,
     title: "Upload your files",
-    body: "Add any files you want to deliver. Solva secures them behind a private, payment-gated link.",
+    body: "Logo files, brand guidelines, every deliverable. Solva holds them behind a private, encrypted link.",
     accent: "#534AB7",
     accentDim: "rgba(83,74,183,0.12)",
     accentBorder: "rgba(83,74,183,0.22)",
     accentGlow: "rgba(83,74,183,0.35)",
-    tag: "Secured",
+    tag: "Locked",
     tagColor: "#A09FD4",
     tagBg: "rgba(83,74,183,0.12)",
     tagBorder: "rgba(83,74,183,0.2)",
@@ -22,13 +22,13 @@ const steps = [
   {
     number: "02",
     icon: Link2,
-    title: "Share a secure link",
-    body: "Send a single link. Recipients can preview access, but files remain locked until payment is completed.",
+    title: "Send the link",
+    body: "Drop it in your email or invoice. Your client sees a preview. The files stay locked.",
     accent: "#534AB7",
     accentDim: "rgba(83,74,183,0.12)",
     accentBorder: "rgba(83,74,183,0.22)",
     accentGlow: "rgba(83,74,183,0.35)",
-    tag: "Access controlled",
+    tag: "Preview only",
     tagColor: "#A09FD4",
     tagBg: "rgba(83,74,183,0.12)",
     tagBorder: "rgba(83,74,183,0.2)",
@@ -36,13 +36,13 @@ const steps = [
   {
     number: "03",
     icon: Zap,
-    title: "Payment completes. Access unlocks instantly.",
-    body: "Once payment is successful, files are automatically unlocked. No manual steps, no delays.",
+    title: "They pay. It unlocks. Instantly.",
+    body: "Payment clears — they get full access. No email from you. No waiting. Done.",
     accent: "#1D9E75",
     accentDim: "rgba(29,158,117,0.1)",
     accentBorder: "rgba(29,158,117,0.28)",
     accentGlow: "rgba(29,158,117,0.4)",
-    tag: "Automated",
+    tag: "Unlocked",
     tagColor: "#1D9E75",
     tagBg: "rgba(29,158,117,0.1)",
     tagBorder: "rgba(29,158,117,0.22)",
@@ -160,7 +160,7 @@ export default function Solution() {
         >
           <span className="h-px w-8 bg-[#534AB7]" />
           <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#534AB7]">
-            How it works — fully automated
+            How it works
           </span>
         </motion.div>
 
@@ -194,8 +194,8 @@ export default function Solution() {
             <span className="h-px w-12 bg-gradient-to-r from-[#534AB7] to-transparent" />
           </div>
           <p className="text-lg font-semibold leading-relaxed text-[#5E5C82] md:text-xl">
-            Nothing about your workflow changes.{" "}
-<span className="text-white">Access is simply controlled until payment is complete.</span>
+            Nothing about how you work changes.{" "}
+            <span className="text-white">You just don't give away leverage anymore.</span>
           </p>
         </motion.div>
 

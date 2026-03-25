@@ -29,43 +29,60 @@ export default function PortalPage() {
   const [payError, setPayError] = useState(null)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState(null)
+  const paid = searchParams.get("paid")
+  const projectIdFromUrl = searchParams.get("project_id")
 
-  useEffect(() => {
-    async function fetchData() {
-      const res = await fetch("/api/projects/public", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug }),
-      })
-      const data = await res.json()
-      if (!data.project) {
-        setLoading(false)
-        return
-      }
-      setProject(data.project)
-      setFiles(data.files || [])
+useEffect(() => {
+  if (!slug) return  // 🚨 THIS IS THE FIX
+
+  async function fetchData() {
+    const res = await fetch("/api/projects/public", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug }),
+    })
+
+    const data = await res.json()
+
+    if (!data.project) {
       setLoading(false)
+      return
     }
-    if (slug) fetchData()
-  }, [slug])
 
-  useEffect(() => {
-    if (mockPayment && project) {
-      fetch("/api/mock/confirm-payment", {
+    setProject(data.project)
+    setFiles(data.files || [])
+    setLoading(false)
+  }
+
+  fetchData()
+}, [slug])
+
+useEffect(() => {
+  if (paid !== "true" || !projectIdFromUrl) return
+
+  ;(async () => {
+    try {
+      await fetch("/api/mock/confirm-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId: project.id }),
-      }).then(() => {
-        window.location.href = `/p/${project.portal_slug}`
+        body: JSON.stringify({ projectId: projectIdFromUrl }),
       })
+
+      // IMPORTANT: only redirect using URL slug, NOT project object
+      window.location.href = `/p/${slug}`
+    } catch {
+      setPayError("Payment confirmation failed.")
     }
-  }, [mockPayment, project])
+  })()
+}, [paid, projectIdFromUrl, slug])
 
   const handlePay = async () => {
     if (isPaying) return
     setPayError(null)
     setIsPaying(true)
     try {
+                console.log("FRONTEND SLUG:", slug)
+
       const res = await fetch("/api/payments/create", {
         method: "POST",
         body: JSON.stringify({ projectId: project.id }),

@@ -6,23 +6,23 @@ import { Plus, Minus } from "lucide-react"
 
 const qas = [
   {
-    q: "Will recipients understand how this works?",
-    a: "They see a simple, secure page. Access is unlocked automatically after payment. No account or setup required.",
+    q: "Will my client understand this?",
+    a: "They get a clean, professional page. They open it, pay, and download. No account. No confusion.",
     index: "01",
   },
   {
-    q: "Is file access secure?",
-    a: "All files are protected and remain inaccessible until payment is successfully completed. Access is controlled at the system level.",
+    q: "Is this secure?",
+    a: "Files are encrypted. Nobody accesses them without payment clearing. Not through the preview. Not at all.",
     index: "02",
   },
   {
-    q: "Does this change how delivery works?",
-    a: "No. You continue your normal workflow, but delivery happens through a secure, payment-gated link instead of direct file transfer.",
+    q: "Does this make me look suspicious?",
+    a: "It makes you look like you've done this before. Established studios do this by default. Now you do too.",
     index: "03",
   },
   {
-    q: "What happens if payment is not completed?",
-    a: "Access remains locked. Files are never delivered unless the required payment is successfully processed.",
+    q: "What if the client refuses?",
+    a: "Then you found out before you lost the files.",
     index: "04",
   },
 ]
@@ -142,7 +142,7 @@ export default function Trust() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="mb-16 max-w-xl text-[2rem] font-bold leading-[1.1] tracking-[-0.035em] text-white md:text-[2.8rem]"
         >
-          Everything you need to know
+          A few things you're probably wondering
         </motion.h2>
 
         {/* Accordion */}

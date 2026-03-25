@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { ShieldCheck, Lock, Unlock, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
-import { useState } from "react"
 
 const stagger = {
   show: { transition: { staggerChildren: 0.09 } },
@@ -47,11 +46,6 @@ const files = [
 ]
 
 export default function Hero() {
-
-  const [email, setEmail] = useState("")
-  const [submitted, setSubmitted] = useState(false)
-
-
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#07061A] flex flex-col justify-center">
 
@@ -70,7 +64,7 @@ export default function Hero() {
           <motion.div variants={fadeUp}>
             <span className="inline-flex items-center gap-2 rounded-full border border-[#534AB7]/40 bg-[#534AB7]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#A09FD4] backdrop-blur-sm">
               <ShieldCheck className="h-3.5 w-3.5 text-[#7F77DD]" strokeWidth={2.5} />
-              Built for digital creators & teams
+              Built for freelance brand designers
             </span>
           </motion.div>
 
@@ -79,9 +73,9 @@ export default function Hero() {
             variants={fadeUp}
             className="mt-8 max-w-3xl text-[2.8rem] font-bold leading-[1.06] tracking-[-0.04em] text-white md:text-[4.5rem]"
           >
-            Get paid before you{" "}
+            Stop sending brand files{" "}
             <span className="bg-gradient-to-r from-[#A09FD4] to-[#7F77DD] bg-clip-text text-transparent">
-              deliver your files.
+              before you get paid.
             </span>
           </motion.h1>
 
@@ -90,49 +84,23 @@ export default function Hero() {
             variants={fadeUp}
             className="mt-6 max-w-lg text-base leading-7 text-[#6E6C99] md:text-lg"
           >
-            Solva locks your files behind a secure payment link.
-Once payment is completed, access unlocks instantly — no manual follow-ups required
-</motion.p>
+            Solva keeps your files locked until your client pays.
+            They pay. The files unlock instantly. You don't chase payments anymore.
+          </motion.p>
+
           {/* CTA */}
           <motion.div variants={fadeUp} className="mt-10 flex flex-col items-center gap-3">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={{ duration: 0.15 }}>
-
-<form
-  onSubmit={(e) => {
-    e.preventDefault()
-    setSubmitted(true)
-    setEmail("")
-  }}
-  className="flex flex-col sm:flex-row items-center justify-center gap-3"
->
-  {submitted ? (
-    <p className="text-green-400 text-sm">
-      You're on the waitlist 🚀
-    </p>
-  ) : (
-    <>
-      <input
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter your email"
-        className="w-72 rounded-xl bg-[#0E0C25] border border-white/[0.08] px-4 py-3 text-sm text-white placeholder:text-[#4E4C70] outline-none focus:border-[#534AB7]"
-      />
-
-      <button
-        type="submit"
-        className="group inline-flex items-center gap-2.5 rounded-xl bg-[#534AB7] px-8 py-3 text-sm font-semibold text-white"
-      >
-        Join waitlist
-      </button>
-    </>
-  )}
-</form>
-
+              <Link
+                href="/login"
+                className="group inline-flex items-center gap-2.5 rounded-xl bg-[#534AB7] px-8 py-4 text-sm font-semibold text-white shadow-[0_0_40px_rgba(83,74,183,0.5)] transition-all duration-200 hover:bg-[#4740A3] hover:shadow-[0_0_56px_rgba(83,74,183,0.65)]"
+              >
+                Lock your next delivery
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} />
+              </Link>
             </motion.div>
             <p className="text-xs text-[#4E4C70]">
-              Early access. No setup required. Takes less than 2 minutes.
+              Free to start. No credit card. Live in 2 minutes.
             </p>
           </motion.div>
 

@@ -5,21 +5,21 @@ import { useRef } from "react"
 
 const lines = [
   {
-    text: "The work is complete. Files are ready. Everything finalized and packaged for delivery.",
+    text: "The brand is done. Weeks of work. Logo suite, color system, brand guidelines — all of it, perfect.",
     size: "body",
   },
-  { text: "You share access.", size: "body" },
+  { text: "You send everything over.", size: "body" },
   { text: "They open the files.", size: "body" },
   { text: "Then nothing.", size: "impact" },
   {
-    text: "Access is granted before payment is completed. Once files are delivered, control is lost.",
+    text: "No payment. No reply. Just silence — while a $3,000 project lives on their desktop, yours in name only.",
     size: "body",
   },
   {
-    text: "You follow up. You wait. The process becomes unpredictable and outside your control.",
+    text: "You follow up. It gets awkward. You wonder if pushing harder costs you the relationship. So you wait.",
     size: "body",
   },
-  { text: "Access was given too early.", size: "callout" },
+  { text: "You lost leverage the moment you hit send.", size: "callout" },
 ]
 
 function ScrollLine({ text, size }) {
@@ -121,7 +121,7 @@ export default function Problem() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="mb-16 max-w-2xl text-[2rem] font-bold leading-[1.1] tracking-[-0.035em] text-white md:text-[2.8rem]"
         >
-          Access without control leads here.
+          You already know exactly how this ends.
         </motion.h2>
 
         {/* ── Scroll-animated lines ── */}
@@ -143,8 +143,8 @@ export default function Problem() {
             <span className="h-px w-12 bg-gradient-to-r from-[#534AB7] to-transparent" />
           </div>
           <p className="text-lg font-semibold leading-relaxed text-[#5E5C82] md:text-xl">
-            This isn't just about payments.{" "}
-<span className="text-white">It's about controlling access to your files.</span>
+            This isn't a payment problem.{" "}
+            <span className="text-white">It's a leverage problem.</span>
           </p>
         </motion.div>
 
